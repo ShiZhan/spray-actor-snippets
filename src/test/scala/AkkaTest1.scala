@@ -8,7 +8,7 @@ class Controller extends Actor {
   }
 }
 
-object AkkaTest extends App {
+object AkkaTest1 extends App {
   def console(controller: ActorRef): Unit =
     for (line <- io.Source.stdin.getLines) line.split(' ').toList match {
       case "exit" :: Nil =>
