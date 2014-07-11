@@ -7,7 +7,7 @@ object AkkaTest2 {
     def receive = {
       case "hello" => println("hello back at you")
       case "report" => followers.foreach(_ ! "report")
-      case "exit" => { followers.foreach(_ ! "exit"); exit }
+      case "exit" => { followers.foreach(_ ! "exit"); sys.exit }
       case _ => println("huh?")
     }
   }
@@ -15,7 +15,7 @@ object AkkaTest2 {
   class Follower(index: Int) extends Actor {
     def receive = {
       case "report" => println(index + ": stand ready")
-      case "exit" => { println(index + ": stand down"); exit }
+      case "exit" => { println(index + ": stand down"); sys.exit }
       case _ => println("huh?")
     }
   }
@@ -23,7 +23,7 @@ object AkkaTest2 {
   def console(leader: ActorRef): Unit =
     for (line <- io.Source.stdin.getLines) line.split(' ').toList match {
       case "exit" :: Nil => { leader ! "exit"; return }
-      case any => any.filterNot("exit" ==).foreach(leader ! _)
+      case any => any.filterNot(_ == "exit").foreach(leader ! _)
     }
 
   def main(args: Array[String]) = {

@@ -3,7 +3,7 @@ import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
 class Controller extends Actor {
   def receive = {
     case "hello" => println("hello back at you")
-    case "exit" => exit
+    case "exit" => sys.exit
     case _ => println("huh?")
   }
 }
@@ -13,7 +13,7 @@ object AkkaTest1 extends App {
     for (line <- io.Source.stdin.getLines) line.split(' ').toList match {
       case "exit" :: Nil =>
         controller ! "exit"; return
-      case any => any.foreach(controller ! _)
+      case any => any.filterNot(_ == "exit").foreach(controller ! _)
     }
 
   val system = ActorSystem("CoreSystem")

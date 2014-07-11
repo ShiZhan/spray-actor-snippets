@@ -7,22 +7,22 @@ object AkkaTest3 {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   class Leader(followers: Array[ActorRef]) extends Actor {
-    implicit val timeout = Timeout(5 seconds)
+    implicit val timeout = Timeout(5.seconds)
     def receive = {
       case "hello" => println("hello back at you")
       case "report" =>
         val futures = followers.map(_ ? "report").map(_.mapTo[String])
         val results = Future.reduce(futures)(_ + "\n---\n" + _)
         results.foreach(println)
-      case "exit" => { followers.foreach(_ ! "exit"); exit }
+      case "exit" => { followers.foreach(_ ! "exit"); sys.exit }
       case _ => println("huh?")
     }
   }
 
   class Follower(index: Int) extends Actor {
     def receive = {
-      case "report" => { Thread.sleep((1 seconds).toMillis); sender ! (index + ": stand ready") }
-      case "exit" => { println(index + ": stand down"); exit }
+      case "report" => { Thread.sleep((1.seconds).toMillis); sender ! (index + ": stand ready") }
+      case "exit" => { println(index + ": stand down"); sys.exit }
       case _ => println("huh?")
     }
   }
@@ -30,7 +30,7 @@ object AkkaTest3 {
   def console(leader: ActorRef): Unit =
     for (line <- io.Source.stdin.getLines) line.split(' ').toList match {
       case "exit" :: Nil => { leader ! "exit"; return }
-      case any => any.filterNot("exit" ==).foreach(leader ! _)
+      case any => any.filterNot(_ == "exit").foreach(leader ! _)
     }
 
   def main(args: Array[String]) = {
