@@ -2,12 +2,6 @@ object AkkaTest4 {
   import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
   import scala.util.Random
 
-  def edgeIn(index: Int)(implicit m: Array[Array[Int]]) =
-    m.map(_(index)).zipWithIndex.filter(_._1 != 0)
-
-  def edgeOut(index: Int)(implicit m: Array[Array[Int]]) =
-    m(index).zipWithIndex.filter(_._1 != 0)
-
   sealed abstract class Messages
   case class UPDATE(value: Int) extends Messages
   case class STOP() extends Messages
@@ -46,10 +40,11 @@ object AkkaTest4 {
 
   class Monitor extends Actor {
     var counter = 0
+    val vertices = context.actorSelection(up + nameOfVertexPrefix + "*")
     def receive = {
       case UPDATE(delta) => {
         counter += delta
-        if (counter == 0) { context.actorSelection(up + nameOfVertexPrefix + "*") ! STOP; sys.exit }
+        if (counter == 0) { vertices ! STOP; sys.exit }
       }
     }
   }
