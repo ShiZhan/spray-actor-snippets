@@ -14,7 +14,8 @@ object AkkaTest4 {
   case class HALT() extends Messages
 
   val nameOfMonitor = "Monitor"
-  def nameOfVertex(index: Int) = "Vertex%03d".format(index)
+  val nameOfVertexPrefix = "Vertex"
+  def nameOfVertex(index: Int) = nameOfVertexPrefix + "%03d".format(index)
   val up = "../"
 
   type Matrix = Array[Array[Int]]
@@ -27,25 +28,28 @@ object AkkaTest4 {
       Array.tabulate(vertexTotal)(index => context.actorSelection(up + nameOfVertex(index)))
     var value = Int.MaxValue
     def receive = {
-      case UPDATE(newValue) => if (newValue < value) {
-        value = newValue
-        if (!in.isEmpty) for ((length, next) <- in) {
-          println(s"$index->$next:$value+$length")
-          monitor ! UPDATE(in.length - 1)
-          vertices(next) ! UPDATE(value + length)
+      case UPDATE(newValue) =>
+        if (newValue < value) {
+          value = newValue
+          if (!in.isEmpty) {
+            monitor ! UPDATE(in.length)
+            for ((length, next) <- in) {
+              println(s"$index->$next:$value+$length")
+              vertices(next) ! UPDATE(value + length)
+            }
+          }
         }
-        else monitor ! UPDATE(-1)
-      } else monitor ! UPDATE(-1)
+        monitor ! UPDATE(-1)
       case STOP => sys.exit
     }
   }
 
-  class Monitor(vertices: Array[ActorRef]) extends Actor {
+  class Monitor extends Actor {
     var counter = 0
     def receive = {
       case UPDATE(delta) => {
         counter += delta
-        if (counter == 0) { vertices.foreach(_ ! STOP); sys.exit }
+        if (counter == 0) { context.actorSelection(up + nameOfVertexPrefix + "*") ! STOP; sys.exit }
       }
     }
   }
@@ -58,7 +62,7 @@ object AkkaTest4 {
     val vertices = Array.tabulate(vertexTotal) { index =>
       system.actorOf(Props(new Vertex(index, m)), name = nameOfVertex(index))
     }
-    val monitor = system.actorOf(Props(new Monitor(vertices)), name = nameOfMonitor)
+    val monitor = system.actorOf(Props[Monitor], name = nameOfMonitor)
     monitor ! UPDATE(1)
     vertices(vertexTotal - 1) ! UPDATE(0)
   }
