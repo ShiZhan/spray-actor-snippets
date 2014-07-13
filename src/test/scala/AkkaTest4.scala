@@ -1,5 +1,5 @@
 object AkkaTest4 {
-  import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
+  import akka.actor.{ Actor, ActorLogging, ActorRef, ActorSystem, Props }
   import scala.util.Random
 
   sealed abstract class Messages
@@ -13,7 +13,7 @@ object AkkaTest4 {
   val up = "../"
 
   type Matrix = Array[Array[Int]]
-  class Vertex(index: Int, m: Matrix) extends Actor {
+  class Vertex(index: Int, m: Matrix) extends Actor with ActorLogging {
     val vertexTotal = m.length
     val in = m.map(_(index)).zipWithIndex.filter(_._1 != 0)
     val out = m(index).zipWithIndex.filter(_._1 != 0)
@@ -28,7 +28,7 @@ object AkkaTest4 {
           if (!in.isEmpty) {
             monitor ! UPDATE(in.length)
             for ((length, next) <- in) {
-              println(s"$index->$next:$value+$length")
+              log.info("{}->{}:{}+{}", index, next, value, length)
               vertices(next) ! UPDATE(value + length)
             }
           }
