@@ -30,7 +30,7 @@ object AkkaTest3 {
   def console(leader: ActorRef): Unit =
     for (line <- io.Source.stdin.getLines) line.split(' ').toList match {
       case "exit" :: Nil => { leader ! "exit"; return }
-      case any => any.filterNot(_ == "exit").foreach(leader ! _)
+      case any => any.filterNot(i => i == "exit" || i == "").foreach(leader ! _)
     }
 
   def main(args: Array[String]) = {
