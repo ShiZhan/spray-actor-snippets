@@ -49,16 +49,19 @@ object AkkaTest4 {
     }
   }
 
-  def main(args: Array[String]) = {
-    val vertexTotal = args.head.toInt
-    val m = Array.fill(vertexTotal, vertexTotal)(Random.nextInt(2))
-    val system = ActorSystem("CoreSystem")
+  def main(args: Array[String]) = args.toList match {
+    case total :: range :: Nil =>
+      val vertexTotal = try { total.toInt } catch { case e: Exception => 8 }
+      val edgeRange = try { range.toInt } catch { case e: Exception => 2 }
+      val m = Array.fill(vertexTotal, vertexTotal)(Random.nextInt(2))
+      val system = ActorSystem("CoreSystem")
 
-    val vertices = Array.tabulate(vertexTotal) { index =>
-      system.actorOf(Props(new Vertex(index, m)), name = nameOfVertex(index))
-    }
-    val monitor = system.actorOf(Props[Monitor], name = nameOfMonitor)
-    monitor ! UPDATE(1)
-    vertices(vertexTotal - 1) ! UPDATE(0)
+      val vertices = Array.tabulate(vertexTotal) { index =>
+        system.actorOf(Props(new Vertex(index, m)), name = nameOfVertex(index))
+      }
+      val monitor = system.actorOf(Props[Monitor], name = nameOfMonitor)
+      monitor ! UPDATE(1)
+      vertices(vertexTotal - 1) ! UPDATE(0)
+    case _ =>
   }
 }
