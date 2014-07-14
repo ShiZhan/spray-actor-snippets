@@ -46,7 +46,7 @@ object AkkaTest5 {
     }
   }
 
-  class Follower(index: Int) extends Actor with ActorLogging with TurnBehavior {
+  class Follower extends Actor with ActorLogging with TurnBehavior {
     def receive = start orElse common
   }
 
@@ -59,7 +59,7 @@ object AkkaTest5 {
   def main(args: Array[String]) = {
     val system = ActorSystem("CoreSystem")
     val followers = Array.tabulate(args.head.toInt) { index =>
-      system.actorOf(Props(new Follower(index)), name = "follower" + "%03d".format(index))
+      system.actorOf(Props[Follower], name = "follower" + "%03d".format(index))
     }
     val leader = system.actorOf(Props(new Leader(followers)), name = "leader")
     console(leader)
