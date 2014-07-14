@@ -4,8 +4,6 @@ version := "1.0"
 
 scalaVersion := Option(System.getProperty("scala.version")).getOrElse("2.10.4")
 
-scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
-
 resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
 
 resolvers += "spray repo" at "http://repo.spray.io"
