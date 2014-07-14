@@ -53,7 +53,7 @@ object AkkaTest4 {
     case total :: range :: Nil =>
       val vertexTotal = try { total.toInt } catch { case e: Exception => 8 }
       val edgeRange = try { range.toInt } catch { case e: Exception => 2 }
-      val m = Array.fill(vertexTotal, vertexTotal)(Random.nextInt(2))
+      val m = Array.fill(vertexTotal, vertexTotal)(Random.nextInt(edgeRange))
       val system = ActorSystem("CoreSystem")
 
       val vertices = Array.tabulate(vertexTotal) { index =>
