@@ -12,7 +12,9 @@ object LiveTriples {
       val service = system.actorOf(Props[LiveTriplesServiceActor], "live-triples-service")
       implicit val timeout = Timeout(5.seconds)
       IO(Http) ? Http.Bind(service, interface = host, port = port.toInt)
-      println("Service started.")
+      println("Service started, input [exit] to quit.")
+      while(readLine != "exit") {}
+      system.shutdown()
     case _ => println("LiveTriples <host> <port>")
   }
 }
