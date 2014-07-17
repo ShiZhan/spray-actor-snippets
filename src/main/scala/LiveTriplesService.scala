@@ -5,13 +5,15 @@ import MediaTypes._
 
 class LiveTriplesServiceActor extends Actor with LiveTriplesService {
   def actorRefFactory = context
-  def receive = runRoute(ltRoute)
+  def receive = runRoute(routes)
 }
 
 trait LiveTriplesService extends HttpService {
-  val ltRoute =
-    path("") {
-      get {
+  val routes =
+    get {
+      pathSingleSlash {
+        redirect("/triples", StatusCodes.Found)
+      } ~ path("triples") {
         respondWithMediaType(`text/html`) {
           complete {
             <html>
@@ -20,6 +22,12 @@ trait LiveTriplesService extends HttpService {
               </body>
             </html>
           }
+        }
+      } ~ path("status") {
+        complete {
+          <html>
+            <h1>System status</h1>
+          </html>
         }
       }
     }
