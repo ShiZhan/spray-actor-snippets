@@ -8,8 +8,8 @@ object MyBuild extends Build {
     scalaVersion := Option(System.getProperty("scala.version")).getOrElse("2.10.4")
   )
 
-  lazy val livetriples = Project(
-    id = "LiveTriples",
+  lazy val sprayactorsnippets = Project(
+    id = "SprayActorSnippets",
     base = file("."),
     settings = Defaults.defaultSettings ++
     sbtassembly.Plugin.assemblySettings

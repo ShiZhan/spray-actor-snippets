@@ -1,5 +1,3 @@
-package Kernel
-
 object Service {
   import akka.actor.Actor
   import spray.routing._
@@ -40,5 +38,15 @@ object ServiceWrapper {
     println("Service started, input [exit] to quit.")
     while (readLine != "exit") {}
     system.shutdown()
+  }
+}
+
+object SprayTest3 {
+  import ServiceWrapper.runService
+
+  def main(args: Array[String]) = args.toList match {
+    case host :: port :: Nil if (port.forall(_.isDigit)) => runService(host, port.toInt)
+    case Nil => runService()
+    case _ => println("LiveTriples <host> <port>")
   }
 }
