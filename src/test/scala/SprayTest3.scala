@@ -30,14 +30,14 @@ object ServiceWrapper {
 
   private lazy val defaultIP = java.net.InetAddress.getLocalHost.getHostAddress
 
-  def runService(host: String = defaultIP, port: Int = 8080) = {
+  def runService(host: String = defaultIP, port: Int = 8080): Unit = {
     implicit val system = ActorSystem("CoreSystem")
     val ltService = system.actorOf(Props[Service.LiveTriplesService], "live-triples")
     implicit val timeout = Timeout(5.seconds)
     IO(Http) ? Http.Bind(ltService, interface = host, port = port.toInt)
     println("Service started, input [exit] to quit.")
-    while (readLine != "exit") {}
-    system.shutdown()
+    for (line <- io.Source.fromInputStream(System.in).getLines())
+      if (line == "exit") { system.shutdown(); return }
   }
 }
 
