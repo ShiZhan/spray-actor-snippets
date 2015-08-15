@@ -21,6 +21,8 @@ object Service {
 }
 
 object ServiceWrapper {
+  import java.net.InetAddress
+  import scala.io.Source
   import akka.actor.{ ActorSystem, Props }
   import akka.io.IO
   import spray.can.Http
@@ -28,7 +30,7 @@ object ServiceWrapper {
   import akka.util.Timeout
   import scala.concurrent.duration._
 
-  private lazy val defaultIP = java.net.InetAddress.getLocalHost.getHostAddress
+  private lazy val defaultIP = InetAddress.getLocalHost.getHostAddress
 
   def runService(host: String = defaultIP, port: Int = 8080): Unit = {
     implicit val system = ActorSystem("CoreSystem")
@@ -36,8 +38,12 @@ object ServiceWrapper {
     implicit val timeout = Timeout(5.seconds)
     IO(Http) ? Http.Bind(ltService, interface = host, port = port.toInt)
     println("Service started, input [exit] to quit.")
-    for (line <- io.Source.fromInputStream(System.in).getLines())
-      if (line == "exit") { system.shutdown(); return }
+    print("# ")
+    for (line <- Source.fromInputStream(System.in).getLines().takeWhile(_ != "exit")) {
+      println("")
+      print("# ")
+    }
+    system.shutdown()
   }
 }
 
